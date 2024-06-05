@@ -25,7 +25,11 @@ episodes = 0
 
 # Global Constants, change these
 MAX_EPISODES = 100
-EPSILON = 0.1
+EPSILON = 0.1 
+DISCOUNT = 0.001 #learning rate
+BUFFER_BATCH_SIZE = 10000
+BATCH_SIZE = 32
+
 
 
 if __name__ == "__main__":
