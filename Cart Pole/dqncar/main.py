@@ -13,7 +13,7 @@ import tensorflow as tf
 # ex: pip install numpy or pip install torch
 
 
-#from DQN import DQNAgent
+from DQN import DQNAgent
 
 
 
@@ -24,7 +24,8 @@ output_dims = 2
 episodes = 0
 
 # Global Constants, change these
-MAX_EPISODES = 1
+MAX_EPISODES = 100
+EPSILON = 0.1
 
 
 if __name__ == "__main__":
@@ -37,15 +38,15 @@ if __name__ == "__main__":
     while episodes < MAX_EPISODES:
         time_step = 0
         rewards = []
-        #agent.replay_memory.erase_memory()
+        agent.replay_memory.erase_memory()
         observation, info = env.reset()
         time_step = 0
         done = False
 
         while not done:
 
-            # Get action, ideally through your agent
-            action = env.action_space.sample()
+            # Get action through agent
+            action = env.action_space.get_action(state)
             
             # Take the action and observe the result
             observation, reward, terminated, trunicated, info = env.step(action)
