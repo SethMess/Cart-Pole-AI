@@ -13,19 +13,20 @@ import tensorflow as tf
 import torch
 
 class DQNAgent():
-    def __init__(self, input_dims, output_dims, env, epsilon=0.1):
+    def __init__(self, input_dims, output_dims, env, epsilon=0.1, learning_rate=0.001):
             self.output_dims = output_dims
             self.input_dims = input_dims
             self.observation_space = env.observation_space
 
             self.epsilon = epsilon
+            self.learning_rate = learning_rate
 
             self.model = Model(input_dims, output_dims)  # Create your model
             self.target_model = Model(input_dims, output_dims)  # Create your target model
 
             self.replay_memory = ReplayBuffer()  # Create your replay buffer
 
-            self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)  # Create your optimizer
+            self.optimizer = torch.optim.Adam(self.model.parameters(), lr=learning_rate)  # Create your optimizer
 
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")  # Set your device
             self.model.to(self.device)  # Move your model to the device
@@ -96,7 +97,7 @@ class DQNAgent():
             next_state.append(n)
 
         # Convert list of tensors to tensor.
-        combined_tensor = torch.stack([state, action, reward, next_state], dim=0)
+        # combined_tensor = torch.stack([state, action, reward, next_state], dim=0) #I think this is wrong - Tristan
         
 
         # One hot encoding our actions. 
