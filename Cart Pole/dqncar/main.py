@@ -29,6 +29,7 @@ MAX_EPISODES = 1
 
 if __name__ == "__main__":
     env = gym.make('CartPole-v1', render_mode='human')
+    state = env.reset()
     agnet = DQNAgent(input_dims, output_dims, env) #added env to the DQNAgent class
 
     # Make the main game loop.  
@@ -42,8 +43,7 @@ if __name__ == "__main__":
         done = False
 
         while not done:
-            
-            
+
             # Get action, ideally through your agent
             action = env.action_space.sample()
             
@@ -51,6 +51,7 @@ if __name__ == "__main__":
             observation, reward, terminated, trunicated, info = env.step(action)
             
             # Accumulate the reward
+            rewards.append(reward)
 
             # Check if we lost
             if terminated or trunicated:
@@ -58,6 +59,8 @@ if __name__ == "__main__":
 
 
             # Store our memory
+            agent.replay_memory.store_memory((state, action, reward, observation))
+            state = observation
 
             # learn?
             #agent.learn()
