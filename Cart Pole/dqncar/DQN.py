@@ -74,20 +74,30 @@ class DQNAgent():
         it returns a tuple in case you want to keep track of your losses (you do)
         '''
         loss = 0
+        BUFFER_BATCH_SIZE = 10000
+        BATCH_SIZE = 32
+        
         # We just pass through the learn function if the batch size has not been reached. 
-        #if self.replay_memory.__len__() < BUFFER_BATCH_SIZE:
-        #    return
+        if self.replay_memory.__len__() < BUFFER_BATCH_SIZE:
+           return
 
         state = []
         action = []
         reward = []
         next_state = []
         
-        #for _ in range(BATCH_SIZE):
-        #    s, a, r, n = self.replay_memory.collect_memory()
+        for _ in range(BATCH_SIZE):
+            s, a, r, n = self.replay_memory.collect_memory()
+
             # append to lists above probably
+            state.append(s)
+            action.append(a)
+            reward.append(r)
+            next_state.append(n)
 
         # Convert list of tensors to tensor.
+        combined_tensor = torch.stack([state, action, reward, next_state], dim=0)
+        
 
         # One hot encoding our actions. 
 
