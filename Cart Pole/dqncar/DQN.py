@@ -13,10 +13,12 @@ import tensorflow as tf
 import torch
 
 class DQNAgent():
-    def __init__(self, input_dims, output_dims, env):
+    def __init__(self, input_dims, output_dims, env, epsilon=0.1):
             self.output_dims = output_dims
             self.input_dims = input_dims
             self.observation_space = env.observation_space
+
+            self.epsilon = epsilon
 
             self.model = Model(input_dims, output_dims)  # Create your model
             self.target_model = Model(input_dims, output_dims)  # Create your target model
@@ -30,7 +32,7 @@ class DQNAgent():
             self.target_model.to(self.device)  # Move your target model to the device
 
     # Method for predicting an action 
-    def get_action(self, state) -> int:
+    def get_action(self, state, training=True) -> int:
         ''' 
         Get action function call.
         Ideally your state is processed by your target network. 
@@ -41,7 +43,23 @@ class DQNAgent():
         or it can be inputted into this function as a tensor already. 
         mostly fashion. do what you please.
         '''
-        action = 0
+        
+        self.model.train(training)
+
+        # Explore vs Expliot rule
+        random = np.random.rand()
+        
+        if random > self.epsilon: #epsilon=0.1
+          action = env.action_space.sample()
+
+        else:
+            #turn state into pytorch tensor
+            state = torch.from_numpy(state).float().unsqueeze(0).to(self.device) 
+    
+            QModel = self.model(state)
+            action = torch.argmax(QModel).item()
+        
+        #print(f"action taken: {action}")
         return action
     
     def learn(self) -> float:
@@ -64,6 +82,7 @@ class DQNAgent():
         action = []
         reward = []
         next_state = []
+        
         #for _ in range(BATCH_SIZE):
         #    s, a, r, n = self.replay_memory.collect_memory()
             # append to lists above probably
