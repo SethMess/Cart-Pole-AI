@@ -97,7 +97,10 @@ class DQNAgent():
             next_state.append(n)
 
         # Convert list of tensors to tensor.
-        # combined_tensor = torch.stack([state, action, reward, next_state], dim=0) #I think this is wrong - Tristan
+        state_tensor = torch.tensor(state, dtype=torch.float32).to(self.device)
+        action_tensor = torch.tensor(action, dtype=torch.float32).to(self.device)
+        reward_tensor = torch.tensor(reward, dtype=torch.float32).to(self.device)
+        next_state_tensor = torch.tensor(next_state, dtype=torch.float32).to(self.device)
         
 
         # One hot encoding our actions. 
@@ -122,9 +125,8 @@ class DQNAgent():
         return loss 
 
     def save(self, save_to_path: str) -> None:
-        # if pytorch
-        #torch.save(self.target_model.state_dict(), save_to_path)
-        pass
+        # if pytorch:
+        torch.save(self.target_model.state_dict(), save_to_path)
 
     def load(self, load_path: str) -> None:
 
@@ -133,10 +135,8 @@ class DQNAgent():
         #loaded_model = tf.keras.models.load_model(load_path)
 
         # if pytorch
-        #self.target_model.load_state_dict(torch.load(load_path))
-        #self.model.load_state_dict(torch.load(load_path))
-
-        pass
+        self.target_model.load_state_dict(torch.load(load_path))
+        self.model.load_state_dict(torch.load(load_path))
 
 
 
