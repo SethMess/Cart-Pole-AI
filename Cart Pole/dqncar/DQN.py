@@ -48,9 +48,9 @@ class DQNAgent():
         self.model.train(training)
 
         # Explore vs Expliot rule
-        random = np.random.rand()
+        random = np.random.rand()    #assigns a random float in the range [0,1)
         
-        if random > self.epsilon: #epsilon=0.1
+        if random < self.epsilon:
           action = env.action_space.sample()
 
         else:
