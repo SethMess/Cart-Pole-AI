@@ -22,11 +22,11 @@ input_dims = 4
 output_dims = 2
 # likely want to put in some other cool things here like batch size, learning rate, etc. 
 episodes = 0
+epsilon = 0.1
+discount = 0.001 #learning rate
 
 # Global Constants, change these
 MAX_EPISODES = 100
-EPSILON = 0.1 
-DISCOUNT = 0.001 #learning rate
 BUFFER_BATCH_SIZE = 10000
 BATCH_SIZE = 32
 
@@ -35,7 +35,7 @@ BATCH_SIZE = 32
 if __name__ == "__main__":
     env = gym.make('CartPole-v1', render_mode='human')
     state = env.reset()
-    agnet = DQNAgent(input_dims, output_dims, env) #added env to the DQNAgent class
+    agnet = DQNAgent(input_dims, output_dims, env, epsilon, discount) #added env to the DQNAgent class
 
     # Make the main game loop.  
 
@@ -68,11 +68,11 @@ if __name__ == "__main__":
             state = observation
 
             # learn?
-            #agent.learn()
+            agent.learn()
             time_step += 1
 
             env.render()
         
     # TODO: Check if reward normalization makes sense!
-    # agent.save()
+    agent.save()
     env.close()
