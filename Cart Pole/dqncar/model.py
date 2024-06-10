@@ -9,7 +9,7 @@ import tensorflow
 
 
 
-def Model(self, input_dims, output_dims):
+def Model(input_dims, output_dims):
     '''This shouldn't need to be a class. This model should be very simple.
     Especially for cartpole, like, 2 dense, an output, and no convolutions 
     should be more than enough.'''

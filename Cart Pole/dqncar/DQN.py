@@ -1,6 +1,7 @@
 # Misc imports
 import numpy as np
 import random as rnd
+import gym
 
 # These are your other files.
 from buffer import ReplayBuffer
@@ -45,7 +46,8 @@ class DQNAgent():
         mostly fashion. do what you please.
         '''
         
-        self.model.train(training)
+        # Train does not exit yet
+        self.model.train(training) 
 
         # Explore vs Expliot rule
         random = np.random.rand()    #assigns a random float in the range [0,1)
@@ -103,26 +105,28 @@ class DQNAgent():
         next_state_tensor = torch.tensor(next_state, dtype=torch.float32).to(self.device)
         
 
-        # One hot encoding our actions. 
+        # One hot encoding our actions. (probably not important)
 
-        # Find our predictions
+        # Find our predictions (r + max(q(s', a)) find next best values for tensors of new states
+        #predictions = self.model(next_state_tensor)
         
-        # Get the training model assessed Q value of the current turn. 
+        #I just commented out some code I wrote it might be right but it was not needed yet
 
         # get max value
-
+        #max_q_values = torch.max(predictions, dim=1)[0]
         # Calculate our target
-
+        #target_values = reward_tensor + max_q_values
         # Calculate MSE Loss
-
-        # backward pass
-
-        # self.update_target_counter += 1
+        #loss = torch.nn.MSELoss()(predictions, target_values)
+        # backward pass (back propogation)
+        #self.optimizer.zero_grad()  # Clear gradients
+        #loss.backward()  # Backward pass
+        #self.optimizer.step()  # Update weights
 
         #if self.update_target_counter % TARGET_UPDATE == 0:
             # update
 
-        return loss 
+        #return loss 
 
     def save(self, save_to_path: str) -> None:
         # if pytorch:
@@ -150,6 +154,11 @@ if __name__ == "__main__":
     '''
     input_dims = 4
     output_dims = 2
+
+    #These 2 steps are for testing
+    env = gym.make('CartPole-v1', render_mode='human')
+    state = env.reset()
+    
     buffer = DQNAgent(input_dims, output_dims)
     print('dqn agent')
 

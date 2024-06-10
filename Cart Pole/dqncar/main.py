@@ -35,7 +35,7 @@ BATCH_SIZE = 32
 if __name__ == "__main__":
     env = gym.make('CartPole-v1', render_mode='human')
     state = env.reset()
-    agnet = DQNAgent(input_dims, output_dims, env, epsilon, discount) #added env to the DQNAgent class
+    agent = DQNAgent(input_dims, output_dims, env, epsilon, discount) #added env to the DQNAgent class
 
     # Make the main game loop.  
 
@@ -50,7 +50,9 @@ if __name__ == "__main__":
         while not done:
 
             # Get action through agent
-            action = env.action_space.get_action(state)
+            
+            #action = env.action_space.get_action(state)
+            action = env.action_space.sample()
             
             # Take the action and observe the result
             observation, reward, terminated, trunicated, info = env.step(action)
