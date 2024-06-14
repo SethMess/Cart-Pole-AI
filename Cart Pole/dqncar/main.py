@@ -44,6 +44,7 @@ if __name__ == "__main__":
         rewards = []
         agent.replay_memory.erase_memory()
         observation, info = env.reset()
+        state = observation
         time_step = 0
         done = False
 
@@ -52,7 +53,10 @@ if __name__ == "__main__":
             # Get action through agent
             
             #action = env.action_space.get_action(state)
-            action = env.action_space.sample()
+            #action = env.action_space.sample()
+            #print(action)
+            #print(state)
+            action = agent.get_action(state, env)
             
             # Take the action and observe the result
             observation, reward, terminated, trunicated, info = env.step(action)
@@ -66,11 +70,12 @@ if __name__ == "__main__":
 
 
             # Store our memory
-            agent.replay_memory.store_memory((state, action, reward, observation))
+            #agent.replay_memory.store_memory((state, action, reward, observation))
+            #print(observation)
             state = observation
 
             # learn?
-            agent.learn()
+            #agent.learn()
             time_step += 1
 
             env.render()

@@ -34,7 +34,7 @@ class DQNAgent():
             self.target_model.to(self.device)  # Move your target model to the device
 
     # Method for predicting an action 
-    def get_action(self, state, training=True) -> int:
+    def get_action(self, state, env, training=True) -> int:
         ''' 
         Get action function call.
         Ideally your state is processed by your target network. 
@@ -47,7 +47,7 @@ class DQNAgent():
         '''
         
         # Train does not exit yet
-        self.model.train(training) 
+        #self.model.train(training) 
 
         # Explore vs Expliot rule
         random = np.random.rand()    #assigns a random float in the range [0,1)
@@ -57,12 +57,16 @@ class DQNAgent():
 
         else:
             #turn state into pytorch tensor
-            state = torch.from_numpy(state).float().unsqueeze(0).to(self.device) 
-    
+            
+            state = torch.from_numpy(state).float()
+            print(f"state before: {state}")
+            #state = state.unsqueeze(0).to(self.device)
+            #print(f"state after: {state}")
+
             QModel = self.model(state)
             action = torch.argmax(QModel).item()
         
-        #print(f"action taken: {action}")
+        print(f"action taken: {action}")
         return action
     
     def learn(self) -> float:
