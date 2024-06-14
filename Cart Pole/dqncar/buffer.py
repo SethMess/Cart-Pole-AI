@@ -12,6 +12,9 @@ class ReplayBuffer():
 
 
     '''
+    #use a double ended queue a deque works
+    #cur state(input), action, reward, new state
+    #potentially use numpy array that you pre allocate then write over
     def __init__(self):
         self.buffer = deque(maxlen=1000)
 

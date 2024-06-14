@@ -58,7 +58,7 @@ class DQNAgent():
         else:
             #turn state into pytorch tensor
             
-            state = torch.from_numpy(state).float()
+            state = torch.from_numpy(state).float().to(self.device)
             print(f"state before: {state}")
             #state = state.unsqueeze(0).to(self.device)
             #print(f"state after: {state}")

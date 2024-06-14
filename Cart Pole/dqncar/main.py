@@ -26,7 +26,7 @@ epsilon = 0.1
 discount = 0.001 #learning rate
 
 # Global Constants, change these
-MAX_EPISODES = 100
+MAX_EPISODES = 20
 BUFFER_BATCH_SIZE = 10000
 BATCH_SIZE = 32
 
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     agent = DQNAgent(input_dims, output_dims, env, epsilon, discount) #added env to the DQNAgent class
 
     # Make the main game loop.  
-
+    total_rewards = []
     while episodes < MAX_EPISODES:
         time_step = 0
         rewards = []
@@ -47,6 +47,8 @@ if __name__ == "__main__":
         state = observation
         time_step = 0
         done = False
+
+        total_reward = 0
 
         while not done:
 
@@ -68,17 +70,33 @@ if __name__ == "__main__":
             if terminated or trunicated:
                 done = True
 
+            total_reward += reward
+            #GOALS FOR NEXT TIME
+            #store memory
+            #graph results
+            #episode x axis, sum of reward y axis
+            #plt.plot(rewards, label='rewards',)
 
             # Store our memory
-            #agent.replay_memory.store_memory((state, action, reward, observation))
+            #store as a touple
+
+            agent.replay_memory.store_memory((state, action, reward, observation))
             #print(observation)
             state = observation
 
+            # graphs learining over time
             # learn?
             #agent.learn()
             time_step += 1
 
             env.render()
+        
+        total_rewards.append(total_reward)
+        episodes += 1
+    plt.plot(total_rewards)
+    plt.xlabel('Episode')
+    plt.ylabel('Total Reward')
+    plt.show()
         
     # TODO: Check if reward normalization makes sense!
     agent.save()
