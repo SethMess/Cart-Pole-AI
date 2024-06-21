@@ -21,9 +21,10 @@ class DQNAgent():
 
             self.epsilon = epsilon
             self.learning_rate = learning_rate
+            self.update_target_counter = 0
 
             self.model = Model(input_dims, output_dims)  # Create your model
-            self.target_model = Model(input_dims, output_dims)  # Create your target model
+            self.target_model = Model(input_dims, output_dims)  # Create your target model the one that gets updated
 
             self.memory_buffer = ReplayBuffer()  # Create your replay buffer
 
@@ -82,7 +83,9 @@ class DQNAgent():
         '''
         loss = 0
         BUFFER_BATCH_SIZE = 1000
-        BATCH_SIZE = 32
+        BATCH_SIZE = 128
+        TARGET_UPDATE = 3
+
         print("about to learn")
         # We just pass through the learn function if the batch size has not been reached. 
         if len(self.memory_buffer) < BATCH_SIZE:
@@ -104,11 +107,13 @@ class DQNAgent():
         reward_tensor = torch.tensor(reward, dtype=torch.float32).to(self.device)
         next_state_tensor = torch.tensor(next_state, dtype=torch.float32).to(self.device)
         
-        
-        print("state_tensor: ", state_tensor)
-        print("action_tensor: ", action_tensor)
-        print("reward_tensor: ", reward_tensor)
-        print("next_state_tensor: ", next_state_tensor)
+        #print(self.model(state_tensor).shape)
+        #print("Model output shape:", self.model(state_tensor).shape)
+        #print("Action tensor shape after unsqueeze:", action_tensor.long().unsqueeze(-1).shape)
+        # print("state_tensor: ", state_tensor)
+        # print("action_tensor: ", action_tensor)
+        # print("reward_tensor: ", reward_tensor)
+        # print("next_state_tensor: ", next_state_tensor)
         # One hot encoding our actions. (probably not important)
 
         # Find our predictions (r + max(q(s', a)) find next best values for tensors of new states
@@ -118,19 +123,29 @@ class DQNAgent():
 
         # get max value
         #max_q_values = torch.max(predictions, dim=1)[0]
+        state_action_values = self.model(state_tensor).gather(dim=1, index=action_tensor.long().unsqueeze(-1))
+
+        next_state_values = self.model(next_state_tensor).max(dim=1)[0].detach()
         # Calculate our target
         #target_values = reward_tensor + max_q_values
+        expected_state_action_values = (next_state_values * (1-self.epsilon)) + reward_tensor
+
         # Calculate MSE Loss
         #loss = torch.nn.MSELoss()(predictions, target_values)
+        loss = torch.nn.functional.mse_loss(state_action_values, expected_state_action_values.unsqueeze(-1))
+
         # backward pass (back propogation)
-        #self.optimizer.zero_grad()  # Clear gradients
-        #loss.backward()  # Backward pass
-        #self.optimizer.step()  # Update weights
+        self.optimizer.zero_grad()  # Clear gradients
+        loss.backward()  # Backward pass
+        self.optimizer.step()  # Update weights
 
-        #if self.update_target_counter % TARGET_UPDATE == 0:
-            # update
-
-        #return loss 
+        # Update the target network
+        self.update_target_counter += 1
+        if self.update_target_counter % TARGET_UPDATE == 0:
+            self.target_model.load_state_dict(self.model.state_dict())
+        
+        return loss.item()
+        
 
     def save(self, save_to_path: str) -> None:
         # if pytorch:

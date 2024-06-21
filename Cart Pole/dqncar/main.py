@@ -26,20 +26,22 @@ epsilon = 0.1
 discount = 0.001 #learning rate
 
 # Global Constants, change these
-MAX_EPISODES = 100
+MAX_EPISODES = 5000
 BUFFER_BATCH_SIZE = 10000
-BATCH_SIZE = 32
+BATCH_SIZE = 128
 
 
 
 if __name__ == "__main__":
-    env = gym.make('CartPole-v1', render_mode='human')
+    # env = gym.make('CartPole-v1', render_mode='human')
+    env = gym.make('CartPole-v1', render_mode='')
     state = env.reset()
     agent = DQNAgent(input_dims, output_dims, env, epsilon, discount) #added env to the DQNAgent class
     memory_count = 0
     agent.memory_buffer.erase_memory()
     # Make the main game loop.  
     total_rewards = []
+    losses = []
     while episodes < MAX_EPISODES:
         time_step = 0
         rewards = []
@@ -82,7 +84,7 @@ if __name__ == "__main__":
             #store as a touple
 
             agent.memory_buffer.store_memory((state, action, reward, observation))
-            print("In main: ",len(agent.memory_buffer))
+            #print("In main: ",len(agent.memory_buffer))
             state = observation
 
             # graphs learining over time
@@ -90,19 +92,27 @@ if __name__ == "__main__":
             #agent.learn()
             #print ("memory count: ", memory_count)
             if memory_count == BATCH_SIZE:
-                print ("learning")
-                agent.learn()
+                #print ("learning")
+                loss = agent.learn()
+                losses.append(loss)
                 memory_count = 0
             else:
                 memory_count += 1
 
-            env.render()
+            '''render environment'''
+            #env.render()
         
         total_rewards.append(total_reward)
         episodes += 1
     plt.plot(total_rewards)
     plt.xlabel('Episode')
     plt.ylabel('Total Reward')
+    plt.show()
+
+    plt.plot(losses)
+    plt.title('Loss over Time')
+    plt.xlabel('Step')
+    plt.ylabel('Loss')
     plt.show()
 
     #MORE GRAPHS
@@ -113,5 +123,5 @@ if __name__ == "__main__":
     #potentially store loss in a list and graph it
         
     # TODO: Check if reward normalization makes sense!
-    agent.save()
+    #agent.save()
     env.close()

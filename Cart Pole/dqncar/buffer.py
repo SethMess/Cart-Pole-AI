@@ -45,7 +45,7 @@ class ReplayBuffer():
     #DEQUE implementation
     
     def __init__(self):
-        self.buffer = deque(maxlen=1000) #25000 ballpark
+        self.buffer = deque(maxlen=2500) #25000 ballpark
 
     def store_memory(self, experience: tuple):
         self.buffer.append(experience)
