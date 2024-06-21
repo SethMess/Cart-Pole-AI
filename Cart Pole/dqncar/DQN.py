@@ -25,7 +25,7 @@ class DQNAgent():
             self.model = Model(input_dims, output_dims)  # Create your model
             self.target_model = Model(input_dims, output_dims)  # Create your target model
 
-            self.replay_memory = ReplayBuffer()  # Create your replay buffer
+            self.memory_buffer = ReplayBuffer()  # Create your replay buffer
 
             self.optimizer = torch.optim.Adam(self.model.parameters(), lr=learning_rate)  # Create your optimizer
 
@@ -59,14 +59,14 @@ class DQNAgent():
             #turn state into pytorch tensor
             
             state = torch.from_numpy(state).float().to(self.device)
-            print(f"state before: {state}")
+            #print(f"state before: {state}")
             #state = state.unsqueeze(0).to(self.device)
             #print(f"state after: {state}")
 
             QModel = self.model(state)
             action = torch.argmax(QModel).item()
         
-        print(f"action taken: {action}")
+        #print(f"action taken: {action}")
         return action
     
     def learn(self) -> float:
@@ -81,26 +81,22 @@ class DQNAgent():
         it returns a tuple in case you want to keep track of your losses (you do)
         '''
         loss = 0
-        BUFFER_BATCH_SIZE = 10000
+        BUFFER_BATCH_SIZE = 1000
         BATCH_SIZE = 32
-        
+        print("about to learn")
         # We just pass through the learn function if the batch size has not been reached. 
-        if self.replay_memory.__len__() < BUFFER_BATCH_SIZE:
+        if len(self.memory_buffer) < BATCH_SIZE:
+           print(len(self.memory_buffer))
            return
 
+        
         state = []
         action = []
         reward = []
         next_state = []
-        
-        for _ in range(BATCH_SIZE):
-            s, a, r, n = self.replay_memory.collect_memory()
 
-            # append to lists above probably
-            state.append(s)
-            action.append(a)
-            reward.append(r)
-            next_state.append(n)
+        memory = self.memory_buffer.collect_memory(BATCH_SIZE)
+        state, action, reward, next_state = zip(*memory)        
 
         # Convert list of tensors to tensor.
         state_tensor = torch.tensor(state, dtype=torch.float32).to(self.device)
@@ -108,7 +104,11 @@ class DQNAgent():
         reward_tensor = torch.tensor(reward, dtype=torch.float32).to(self.device)
         next_state_tensor = torch.tensor(next_state, dtype=torch.float32).to(self.device)
         
-
+        
+        print("state_tensor: ", state_tensor)
+        print("action_tensor: ", action_tensor)
+        print("reward_tensor: ", reward_tensor)
+        print("next_state_tensor: ", next_state_tensor)
         # One hot encoding our actions. (probably not important)
 
         # Find our predictions (r + max(q(s', a)) find next best values for tensors of new states

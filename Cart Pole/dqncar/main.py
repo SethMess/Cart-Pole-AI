@@ -26,7 +26,7 @@ epsilon = 0.1
 discount = 0.001 #learning rate
 
 # Global Constants, change these
-MAX_EPISODES = 20
+MAX_EPISODES = 100
 BUFFER_BATCH_SIZE = 10000
 BATCH_SIZE = 32
 
@@ -36,16 +36,17 @@ if __name__ == "__main__":
     env = gym.make('CartPole-v1', render_mode='human')
     state = env.reset()
     agent = DQNAgent(input_dims, output_dims, env, epsilon, discount) #added env to the DQNAgent class
-
+    memory_count = 0
+    agent.memory_buffer.erase_memory()
     # Make the main game loop.  
     total_rewards = []
     while episodes < MAX_EPISODES:
         time_step = 0
         rewards = []
-        agent.replay_memory.erase_memory()
+        
         observation, info = env.reset()
         state = observation
-        time_step = 0
+        
         done = False
 
         total_reward = 0
@@ -80,14 +81,20 @@ if __name__ == "__main__":
             # Store our memory
             #store as a touple
 
-            agent.replay_memory.store_memory((state, action, reward, observation))
-            #print(observation)
+            agent.memory_buffer.store_memory((state, action, reward, observation))
+            print("In main: ",len(agent.memory_buffer))
             state = observation
 
             # graphs learining over time
             # learn?
             #agent.learn()
-            time_step += 1
+            #print ("memory count: ", memory_count)
+            if memory_count == BATCH_SIZE:
+                print ("learning")
+                agent.learn()
+                memory_count = 0
+            else:
+                memory_count += 1
 
             env.render()
         
@@ -97,6 +104,13 @@ if __name__ == "__main__":
     plt.xlabel('Episode')
     plt.ylabel('Total Reward')
     plt.show()
+
+    #MORE GRAPHS
+    #mean squared error 
+    #total rewards
+    #epsilon decay
+    #run epoch at the end of the episode
+    #potentially store loss in a list and graph it
         
     # TODO: Check if reward normalization makes sense!
     agent.save()

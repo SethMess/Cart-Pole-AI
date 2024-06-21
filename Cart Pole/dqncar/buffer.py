@@ -14,9 +14,38 @@ class ReplayBuffer():
     '''
     #use a double ended queue a deque works
     #cur state(input), action, reward, new state
-    #potentially use numpy array that you pre allocate then write over
+    # pre-allocate a numpy array
+    '''
     def __init__(self):
-        self.buffer = deque(maxlen=1000)
+        self.buffer_size = 32
+        self.buffer = np.empty((self.buffer_size,), dtype=object)
+        self.buffer_pointer = 0
+
+    def store_memory(self, experience: tuple):
+        self.buffer[self.buffer_pointer] = experience
+        self.buffer_pointer = (self.buffer_pointer + 1) % self.buffer_size
+        if self.buffer_pointer == 0:  # Buffer is full
+            # Call the models learn function and pass the whole buffer
+            self.model.learn(self.buffer)
+
+    def collect_memory(self, batch_size):
+        return self.buffer
+
+        #indices = np.random.choice(len(self.buffer), size=batch_size, replace=False)
+        #return self.buffer[indices]
+
+    def erase_memory(self):
+        self.buffer = np.empty((1000,), dtype=object)
+        self.buffer_pointer = 0
+
+    def __len__(self):
+        return len(self.buffer)
+    '''
+    
+    #DEQUE implementation
+    
+    def __init__(self):
+        self.buffer = deque(maxlen=1000) #25000 ballpark
 
     def store_memory(self, experience: tuple):
         self.buffer.append(experience)
@@ -29,6 +58,8 @@ class ReplayBuffer():
 
     def __len__(self):
         return len(self.buffer)
+    
+    
 
 
 if __name__ == "__main__":
